@@ -2,6 +2,7 @@
   "name": "fridge2recipe",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.34.1",
   "engines": {
     "node": ">=20.9.0"
   },

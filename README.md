@@ -11,12 +11,14 @@ Turn known fridge contents into practical meal plans and recipe suggestions.
 
 ## Requirements
 
-- Node.js 20.9+
-- pnpm
+- Node.js 20.9+ (use `nvm use` — see `.nvmrc`)
+- pnpm 10 via Corepack (do not use Homebrew pnpm 11; it requires Node 22+)
 
 ## Local development
 
 ```bash
+nvm use
+corepack enable
 cp .env.example .env.local
 # Fill in Supabase and AI Gateway keys, or run: vercel env pull .env.local --yes
 
