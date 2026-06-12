@@ -4,10 +4,22 @@ Turn known fridge contents into practical meal plans and recipe suggestions.
 
 ## Documentation
 
-- [AGENTS.md](AGENTS.md) — agent guide, stack direction, and commands
+- [AGENTS.md](AGENTS.md) — agent guide, monorepo map, and commands
 - [CONTEXT.md](CONTEXT.md) — product glossary (domain language only)
-- [docs/architecture.md](docs/architecture.md) — MVP architecture
-- [docs/adr/0001-mvp-platform-stack.md](docs/adr/0001-mvp-platform-stack.md) — platform stack ADR
+- [docs/architecture.md](docs/architecture.md) — monorepo architecture
+- [docs/adr/0001-mvp-platform-stack.md](docs/adr/0001-mvp-platform-stack.md) — initial platform stack ADR
+- [docs/adr/0002-nestjs-monorepo-backend.md](docs/adr/0002-nestjs-monorepo-backend.md) — NestJS monorepo backend ADR
+
+## Monorepo layout
+
+```
+apps/
+  web/       Next.js UI (Vercel) — auth sessions + REST client
+  api/       NestJS REST API (Railway) — product logic, AI, database
+packages/    shared packages (empty for now)
+supabase/    database schema and CLI config
+docs/        architecture and ADRs
+```
 
 ## Requirements
 
@@ -19,30 +31,51 @@ Turn known fridge contents into practical meal plans and recipe suggestions.
 ```bash
 nvm use
 corepack enable
-cp .env.example .env.local
-# Fill in Supabase and AI Gateway keys, or run: vercel env pull .env.local --yes
+cp .env.example .env.local   # repo root — both apps read from here
+# Fill in keys for both apps, or run: vercel env pull .env.local --yes
 
 pnpm install
-pnpm dev
+pnpm dev          # runs web + api in parallel
+```
+
+Run individually:
+
+```bash
+pnpm dev:web      # http://localhost:3000
+pnpm dev:api      # http://localhost:3001
 ```
 
 ## Commands
 
 ```bash
 pnpm dev
+pnpm dev:web
+pnpm dev:api
 pnpm build
 pnpm lint
 pnpm test
 ```
 
+## Environment variables
+
+See [.env.example](.env.example). Web needs `NEXT_PUBLIC_*` Supabase and API URL vars. API needs Supabase service role, JWT secret, and AI Gateway key.
+
 ## Supabase
 
 ```bash
-npx supabase init
 npx supabase link --project-ref <your-project-ref>
-npx supabase gen types typescript --linked > src/lib/supabase/database.types.ts
+npx supabase gen types typescript --linked > apps/api/src/supabase/database.types.ts
 ```
 
 ## Deployment
 
-Production deploys from `main` via Vercel. See [AGENTS.md](AGENTS.md) for the expected Vercel workflow.
+| App | Platform | Root directory |
+|-----|----------|----------------|
+| `apps/web` | Vercel | `apps/web` |
+| `apps/api` | Railway | `apps/api` |
+
+Set Railway env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `AI_GATEWAY_API_KEY`, `WEB_ORIGIN`, `PORT`.
+
+Set Vercel env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_API_URL`.
+
+See [AGENTS.md](AGENTS.md) for the expected Vercel workflow.
