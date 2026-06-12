@@ -1,27 +1,35 @@
 # Fridge2Recipe Architecture
 
-## MVP Shape
+## Monorepo Shape
 
-Fridge2Recipe starts as a single full-stack Next.js application deployed on Vercel. Supabase provides the managed backend capabilities: Postgres database, authentication, storage, and row-level security.
+Fridge2Recipe is a pnpm monorepo with two applications and shared infrastructure:
+
+- `apps/web` — Next.js UI on Vercel (auth sessions only; no direct Postgres access)
+- `apps/api` — NestJS REST API on Railway (all product behavior, AI, and database access)
+- `supabase/` — shared database schema, migrations, and CLI config at the repo root
 
 ```mermaid
 flowchart TD
-  user[User] --> web[Next.js Web App]
-  web --> services[Shared Server Services]
-  services --> db[Supabase Postgres]
-  services --> auth[Supabase Auth]
-  services --> storage[Supabase Storage]
-  services --> aiWrapper[Internal AI Wrapper]
+  user[User] --> web[apps/web Next.js on Vercel]
+  web -->|"Bearer Supabase JWT"| api[apps/api NestJS on Railway]
+  web -->|"cookies only"| auth[Supabase Auth]
+  api -->|"service role + user_id filter"| db[Supabase Postgres]
+  api --> storage[Supabase Storage]
+  api --> aiWrapper[Internal AI Wrapper]
   aiWrapper --> gateway[Vercel AI Gateway]
   gateway --> models[Text Vision Image Models]
 ```
 
 ## Boundaries
 
-- UI code should stay in the Next.js app routes and components.
-- Product behavior should live in shared server-side services, not directly inside pages or route handlers.
-- Supabase access should be typed with generated database types.
-- AI calls should go through an internal wrapper rather than calling provider APIs throughout the codebase.
+- UI code stays in `apps/web` routes and components.
+- Supabase Auth session management stays in `apps/web` (browser and server clients, middleware).
+- All product behavior lives in `apps/api` NestJS modules — not in Next.js pages, route handlers, or `apps/web/src/services`.
+- `apps/web` calls `apps/api` over REST via `apps/web/src/lib/api/client.ts`, forwarding the Supabase access token.
+- `apps/api` validates JWTs with `SUPABASE_JWT_SECRET` and derives `userId` from the token `sub` claim. Never accept `user_id` from request bodies.
+- `apps/api` connects to Supabase with the service role key and filters every query by `userId` in application code. RLS is not relied on as a safety net.
+- Generated database types live in `apps/api/src/supabase/database.types.ts` only.
+- AI calls go through `apps/api/src/ai/` rather than calling provider APIs from feature code.
 
 ## AI Features
 
@@ -36,16 +44,14 @@ Save useful generated outputs so repeated views do not call AI again.
 
 ## Future Chat Agent
 
-Chat integrations such as Telegram should be added through Next.js route handlers.
+Chat integrations such as Telegram will call `apps/api` directly when built. Account linking and bot authentication are deferred — see ADR 0002.
 
 ```mermaid
 flowchart TD
-  telegram[Telegram] --> webhook[Next.js Webhook Route]
-  webhook --> services[Shared Server Services]
-  services --> db[Supabase Postgres]
-  services --> aiWrapper[Internal AI Wrapper]
+  telegram[Telegram] --> api[apps/api NestJS]
+  api --> db[Supabase Postgres]
+  api --> aiWrapper[Internal AI Wrapper]
   aiWrapper --> gateway[Vercel AI Gateway]
-  webhook -. "when needed" .-> workflow[Vercel Workflow DurableAgent]
 ```
 
-Do not introduce a separate agent backend until the route-handler approach becomes insufficient. Add durable workflow support only for multi-step, retryable, long-running, or externally resumed work.
+Do not add chat webhook routes to `apps/web`. The NestJS backend is the single product API for all clients.

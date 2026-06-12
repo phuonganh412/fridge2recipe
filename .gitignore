@@ -16,6 +16,11 @@
 # next.js
 /.next/
 /out/
+apps/web/.next/
+apps/web/out/
+
+# nestjs
+apps/api/dist/
 
 # production
 /build
