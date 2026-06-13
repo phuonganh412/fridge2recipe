@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node scripts/hooks/quality-gate.mjs",
+            "statusMessage": "Running quality gate"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -17,7 +17,15 @@
     "dev:web": "pnpm --filter @fridge2recipe/web dev",
     "dev:api": "pnpm --filter @fridge2recipe/api dev",
     "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
-    "test": "echo \"No tests yet\" && exit 0"
+    "test": "pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2"
   }
 }
