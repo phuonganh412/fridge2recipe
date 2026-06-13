@@ -6,14 +6,14 @@ Fridge2Recipe is a pnpm monorepo with two applications and shared infrastructure
 
 - `apps/web` — Next.js UI on Vercel (auth sessions only; no direct Postgres access)
 - `apps/api` — NestJS REST API on Railway (all product behavior, AI, and database access)
-- `supabase/` — shared database schema, migrations, and CLI config at the repo root
+- `supabase/` — Supabase CLI config for local Auth, Storage, and Postgres; schema is owned by Prisma in `apps/api`
 
 ```mermaid
 flowchart TD
   user[User] --> web[apps/web Next.js on Vercel]
   web -->|"Bearer Supabase JWT"| api[apps/api NestJS on Railway]
   web -->|"cookies only"| auth[Supabase Auth]
-  api -->|"service role + user_id filter"| db[Supabase Postgres]
+  api -->|"DATABASE_URL direct Postgres"| db[Supabase Postgres]
   api --> storage[Supabase Storage]
   api --> aiWrapper[Internal AI Wrapper]
   aiWrapper --> gateway[Vercel AI Gateway]
@@ -27,8 +27,9 @@ flowchart TD
 - All product behavior lives in `apps/api` NestJS modules — not in Next.js pages, route handlers, or `apps/web/src/services`.
 - `apps/web` calls `apps/api` over REST via `apps/web/src/lib/api/client.ts`, forwarding the Supabase access token.
 - `apps/api` validates JWTs with `SUPABASE_JWT_SECRET` and derives `userId` from the token `sub` claim. Never accept `user_id` from request bodies.
-- `apps/api` connects to Supabase with the service role key and filters every query by `userId` in application code. RLS is not relied on as a safety net.
-- Generated database types live in `apps/api/src/supabase/database.types.ts` only.
+- `apps/api` connects to Postgres with Prisma via `DATABASE_URL` (direct connection). Filter every query by `userId` from the JWT in application code.
+- `apps/api` uses `@supabase/supabase-js` for Supabase Storage (and Realtime if added later), not for Postgres queries.
+- Generated Prisma Client lives in `apps/api/generated/prisma`. `apps/api/src/supabase/database.types.ts` remains for Supabase client typings only.
 - AI calls go through `apps/api/src/ai/` rather than calling provider APIs from feature code.
 
 ## AI Features

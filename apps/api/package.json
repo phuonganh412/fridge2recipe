@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "nest start --watch",
-    "build": "nest build",
-    "start": "node dist/main",
-    "lint": "tsc --noEmit"
+    "dev": "prisma generate && nest start --watch",
+    "build": "prisma generate && nest build",
+    "start": "prisma migrate deploy && node dist/main",
+    "lint": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.127",
@@ -14,19 +17,25 @@
     "@nestjs/config": "^4.0.0",
     "@nestjs/core": "^11.0.0",
     "@nestjs/platform-express": "^11.0.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@supabase/supabase-js": "^2.108.1",
     "ai": "^6.0.199",
     "jose": "^6.0.0",
+    "pg": "^8.21.0",
+    "prisma": "^7.8.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.0",
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@types/express": "^5.0.0",
     "@types/node": "^20",
+    "@types/pg": "^8.20.0",
+    "@types/ws": "^8.5.0",
+    "dotenv": "^16.6.1",
     "typescript": "^5"
   }
 }

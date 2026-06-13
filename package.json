@@ -6,6 +6,12 @@
   "engines": {
     "node": ">=20.9.0"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/engines",
+      "prisma"
+    ]
+  },
   "scripts": {
     "dev": "pnpm --parallel -r dev",
     "dev:web": "pnpm --filter @fridge2recipe/web dev",

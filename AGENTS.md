@@ -5,8 +5,8 @@
 | Path | Role |
 |------|------|
 | `apps/web` | Next.js UI on Vercel — rendering, Supabase Auth sessions, REST client |
-| `apps/api` | NestJS REST API on Railway — all product logic, AI, Supabase data access |
-| `supabase/` | Shared database schema and CLI config |
+| `apps/api` | NestJS REST API on Railway — product logic, AI, Prisma Postgres access |
+| `supabase/` | Supabase CLI config (local Auth, Storage, Postgres) |
 | `packages/` | Shared packages (empty for now) |
 | `docs/` | Architecture and ADRs |
 
@@ -15,8 +15,9 @@
 - Product behavior goes in `apps/api`, not `apps/web/src/services` or Next.js route handlers.
 - `apps/web` never queries Postgres directly. Use `apps/web/src/lib/api/client.ts` to call the API.
 - `apps/api` validates Supabase JWTs and filters all queries by `userId` from the token — never from request bodies.
+- Postgres access in `apps/api` uses Prisma (`DATABASE_URL`). `@supabase/supabase-js` is for Storage (and Realtime if needed), not Postgres queries.
+- Database schema lives in `apps/api/prisma/schema.prisma`. Apply changes with `pnpm --filter @fridge2recipe/api prisma:migrate:dev`.
 - AI calls go through `apps/api/src/ai/`, not the web app.
-- Database types are generated into `apps/api/src/supabase/database.types.ts` only.
 
 ## Commands
 
