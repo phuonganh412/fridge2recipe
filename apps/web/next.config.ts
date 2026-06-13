@@ -4,6 +4,12 @@ import type { NextConfig } from "next";
 
 loadEnv({ path: path.join(__dirname, "../../.env.local") });
 loadEnv({ path: path.join(__dirname, "../../.env") });
+if (process.env.AGENT_MODE === "1") {
+  loadEnv({
+    path: path.join(__dirname, "../../.env.agent.local"),
+    override: true,
+  });
+}
 
 const nextConfig: NextConfig = {
   turbopack: {

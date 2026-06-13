@@ -17,6 +17,9 @@ import { SupabaseModule } from "./supabase/supabase.module";
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [
+        ...(process.env.AGENT_MODE === "1"
+          ? [path.join(__dirname, "../../../.env.agent.local")]
+          : []),
         path.join(__dirname, "../../../.env.local"),
         path.join(__dirname, "../../../.env"),
       ],

@@ -9,6 +9,7 @@
 | `supabase/` | Supabase CLI config (local Auth, Storage, Postgres) |
 | `packages/` | Shared packages (empty for now) |
 | `docs/` | Architecture and ADRs |
+| `scripts/agent/` | Local agent stack lifecycle (Docker, seed, screenshots) |
 | `scripts/hooks/` | Shared agent hook scripts (Prettier + type-checked ESLint quality gate) |
 | `.cursor/` | Cursor hook config (`.cursor/hooks.json`) |
 | `.codex/` | Codex hook config (`.codex/hooks.json`) |
@@ -36,7 +37,7 @@ Do not infer implementation from problem statements or finished design discussio
 
 ```bash
 pnpm install
-pnpm dev          # web + api in parallel
+pnpm dev          # web + api in parallel (daily dev, remote Supabase)
 pnpm dev:web
 pnpm dev:api
 pnpm build
@@ -58,10 +59,65 @@ Two-layer quality gates keep AI edits and commits clean:
 
 Do not skip pre-commit with `--no-verify` unless the user explicitly asks.
 
+## Agent harness
+
+Cross-agent local stack for autonomous development. See [docs/adr/0003-agent-harness.md](docs/adr/0003-agent-harness.md).
+
+**Setup (once):**
+
+```bash
+cp .env.agent.example .env.agent.local
+supabase start
+# Copy keys from `supabase status` into .env.agent.local
+pnpm exec playwright install chromium
+```
+
+**Playbook:**
+
+```bash
+pnpm agent:up       # supabase start + docker compose (web + api)
+pnpm agent:seed     # create test User (auth only)
+# optional UI capture (web must be reachable on :3000):
+pnpm agent:screenshot --headed
+# live tail: pnpm agent:logs --since 10m
+pnpm agent:down     # always run, even on failure
+# if DB state is bad: pnpm agent:reset
+```
+
+**Commands:**
+
+| Command | Purpose |
+|---------|---------|
+| `pnpm agent:up` | Start local Supabase + agent containers |
+| `pnpm agent:down` | Stop containers (`--full` also stops Supabase) |
+| `pnpm agent:reset` | Reset local DB, re-seed, restart stack |
+| `pnpm agent:seed` | Create idempotent test **User** |
+| `pnpm agent:logs` | Stream Docker logs (`--since`, `--level error`) |
+| `pnpm agent:screenshot` | Save homepage PNG to `.agent/screenshots/` (`--headed`) |
+| `pnpm agent:run` | Keep stack up with caps + mandatory teardown |
+
+**Screenshots** (gitignored):
+
+```text
+.agent/screenshots/homepage.png
+```
+
+**Failure audit bundle** (optional, via `scripts/agent/capture-logs.sh`):
+
+```text
+.agent/audit/{runId}/
+  server-api.log
+  server-web.log
+  manifest.json
+```
+
+E2E tests are deferred until feature work begins.
+
 ## Documentation
 
 - [docs/architecture.md](docs/architecture.md) — current architecture
 - [docs/adr/0002-nestjs-monorepo-backend.md](docs/adr/0002-nestjs-monorepo-backend.md) — backend split decision
+- [docs/adr/0003-agent-harness.md](docs/adr/0003-agent-harness.md) — local agent harness
 - [CONTEXT.md](CONTEXT.md) — domain glossary (no implementation details)
 
 ## Next.js (apps/web)
