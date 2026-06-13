@@ -52,9 +52,21 @@ pnpm dev
 pnpm dev:web
 pnpm dev:api
 pnpm build
-pnpm lint
-pnpm test
+pnpm typecheck    # tsc --noEmit per app
+pnpm lint         # type-checked ESLint per app
+pnpm test         # Jest per app
+pnpm format       # Prettier (root)
+pnpm format:check
 ```
+
+After `pnpm install`, husky installs automatically via the `prepare` script.
+
+## Quality harness
+
+- **Cursor hooks** (`.cursor/hooks.json`) — auto-format after agent edits and report type-checked ESLint errors back to the agent. Requires a trusted workspace.
+- **Pre-commit** (`.husky/pre-commit`) — runs `pnpm typecheck`, `pnpm lint`, and `pnpm test` before every commit.
+
+See [AGENTS.md](AGENTS.md) for details.
 
 ## Environment variables
 
@@ -86,10 +98,10 @@ npx supabase start   # optional local Postgres, Auth, Storage
 
 ## Deployment
 
-| App | Platform | Root directory |
-|-----|----------|----------------|
-| `apps/web` | Vercel | `apps/web` |
-| `apps/api` | Railway | `apps/api` |
+| App        | Platform | Root directory |
+| ---------- | -------- | -------------- |
+| `apps/web` | Vercel   | `apps/web`     |
+| `apps/api` | Railway  | `apps/api`     |
 
 Set Railway env vars: `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `AI_GATEWAY_API_KEY`, `WEB_ORIGIN`, `PORT`. `pnpm start` runs `prisma migrate deploy` before the API boots.
 

@@ -9,6 +9,7 @@
 | `supabase/` | Supabase CLI config (local Auth, Storage, Postgres) |
 | `packages/` | Shared packages (empty for now) |
 | `docs/` | Architecture and ADRs |
+| `.cursor/` | Project hooks — post-edit Prettier + type-checked ESLint feedback |
 
 ## Talk before action
 
@@ -37,8 +38,21 @@ pnpm dev          # web + api in parallel
 pnpm dev:web
 pnpm dev:api
 pnpm build
-pnpm lint
+pnpm typecheck    # tsc --noEmit per app
+pnpm lint         # type-checked ESLint per app
+pnpm test         # Jest per app
+pnpm format       # Prettier (root)
+pnpm format:check
 ```
+
+## Quality harness
+
+Two-layer quality gates keep AI edits and commits clean:
+
+1. **Edit hook** (`.cursor/hooks.json`) — after agent file edits, Prettier formats the file and type-checked ESLint runs on the edited file. Lint errors are injected back into agent context via `postToolUse`. Requires the workspace to be **trusted** for project hooks to run.
+2. **Pre-commit** (husky) — runs `typecheck → lint → test` on the full repo before any commit.
+
+Do not skip pre-commit with `--no-verify` unless the user explicitly asks.
 
 ## Documentation
 
@@ -49,9 +63,11 @@ pnpm lint
 ## Next.js (apps/web)
 
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+
 <!-- END:nextjs-agent-rules -->
 
 Vercel root directory: `apps/web`.

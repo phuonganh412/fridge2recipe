@@ -15,7 +15,9 @@ export default function Home() {
           <p className="text-sm font-medium text-muted-foreground">
             Personal food planning
           </p>
-          <h1 className="text-4xl font-semibold tracking-tight">Fridge2Recipe</h1>
+          <h1 className="text-4xl font-semibold tracking-tight">
+            Fridge2Recipe
+          </h1>
           <p className="text-lg text-muted-foreground">
             Track fridge inventory, plan meals, and get recipe suggestions from
             what you already have at home.
@@ -26,8 +28,8 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Scaffold ready</CardTitle>
             <CardDescription>
-              Next.js, Tailwind, shadcn/ui, Supabase clients, and shared
-              service folders are in place. Feature work comes next.
+              Next.js, Tailwind, shadcn/ui, Supabase clients, and shared service
+              folders are in place. Feature work comes next.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">

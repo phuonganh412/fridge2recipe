@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import { Controller, Post, UseGuards } from "@nestjs/common";
 
 import { AuthGuard } from "../auth/auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
@@ -7,7 +7,7 @@ import { CurrentUser } from "../auth/current-user.decorator";
 @UseGuards(AuthGuard)
 export class RecipesController {
   @Post("suggest")
-  suggest(@CurrentUser() userId: string, @Body() _body: Record<string, unknown>) {
+  suggest(@CurrentUser() userId: string) {
     return {
       userId,
       suggestions: [],
