@@ -1,10 +1,10 @@
 {
   "version": 1,
   "hooks": {
-    "afterFileEdit": [{ "command": "node .cursor/hooks/quality-gate.mjs" }],
+    "afterFileEdit": [{ "command": "node scripts/hooks/quality-gate.mjs" }],
     "postToolUse": [
       {
-        "command": "node .cursor/hooks/quality-gate.mjs",
+        "command": "node scripts/hooks/quality-gate.mjs",
         "matcher": "Write|StrReplace"
       }
     ]

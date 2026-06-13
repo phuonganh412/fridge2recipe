@@ -63,7 +63,8 @@ After `pnpm install`, husky installs automatically via the `prepare` script.
 
 ## Quality harness
 
-- **Cursor hooks** (`.cursor/hooks.json`) — auto-format after agent edits and report type-checked ESLint errors back to the agent. Requires a trusted workspace.
+- **Cursor hooks** (`.cursor/hooks.json`) — auto-format after agent edits and report type-checked ESLint errors. Requires a trusted workspace.
+- **Codex hooks** (`.codex/hooks.json`) — same behavior; both point at `scripts/hooks/quality-gate.mjs`. Review and trust hooks in Codex with `/hooks`.
 - **Pre-commit** (`.husky/pre-commit`) — runs `pnpm typecheck`, `pnpm lint`, and `pnpm test` before every commit.
 
 See [AGENTS.md](AGENTS.md) for details.

@@ -9,7 +9,9 @@
 | `supabase/` | Supabase CLI config (local Auth, Storage, Postgres) |
 | `packages/` | Shared packages (empty for now) |
 | `docs/` | Architecture and ADRs |
-| `.cursor/` | Project hooks — post-edit Prettier + type-checked ESLint feedback |
+| `scripts/hooks/` | Shared agent hook scripts (Prettier + type-checked ESLint quality gate) |
+| `.cursor/` | Cursor hook config (`.cursor/hooks.json`) |
+| `.codex/` | Codex hook config (`.codex/hooks.json`) |
 
 ## Talk before action
 
@@ -49,7 +51,9 @@ pnpm format:check
 
 Two-layer quality gates keep AI edits and commits clean:
 
-1. **Edit hook** (`.cursor/hooks.json`) — after agent file edits, Prettier formats the file and type-checked ESLint runs on the edited file. Lint errors are injected back into agent context via `postToolUse`. Requires the workspace to be **trusted** for project hooks to run.
+1. **Edit hook** — after agent file edits, Prettier formats the file and type-checked ESLint runs on the edited file. Lint errors are injected back into agent context. Both agents call the shared script at `scripts/hooks/quality-gate.mjs`.
+   - **Cursor**: `.cursor/hooks.json` (`afterFileEdit` + `postToolUse`). Requires a **trusted** workspace.
+   - **Codex**: `.codex/hooks.json` (`PostToolUse` on `Edit|Write|apply_patch`). Trust project hooks via `/hooks` in the Codex CLI.
 2. **Pre-commit** (husky) — runs `typecheck → lint → test` on the full repo before any commit.
 
 Do not skip pre-commit with `--no-verify` unless the user explicitly asks.
