@@ -1,0 +1,18 @@
+FROM node:20-bookworm
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN corepack enable && corepack prepare pnpm@10.34.1 --activate
+
+WORKDIR /app
+
+# Install deps once; source is bind-mounted at runtime for dev watch mode.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json apps/api/
+COPY apps/web/package.json apps/web/
+COPY packages packages
+
+RUN pnpm install --frozen-lockfile
+
+COPY . .

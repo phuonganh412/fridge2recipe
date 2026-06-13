@@ -9,6 +9,7 @@ Turn known fridge contents into practical meal plans and recipe suggestions.
 - [docs/architecture.md](docs/architecture.md) — monorepo architecture
 - [docs/adr/0001-mvp-platform-stack.md](docs/adr/0001-mvp-platform-stack.md) — initial platform stack ADR
 - [docs/adr/0002-nestjs-monorepo-backend.md](docs/adr/0002-nestjs-monorepo-backend.md) — NestJS monorepo backend ADR
+- [docs/adr/0003-agent-harness.md](docs/adr/0003-agent-harness.md) — local agent harness ADR
 
 ## Monorepo layout
 
@@ -109,3 +110,17 @@ Set Railway env vars: `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY
 Set Vercel env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_API_URL`.
 
 See [AGENTS.md](AGENTS.md) for the expected Vercel workflow.
+
+## Agent harness
+
+For autonomous agent runs (Cursor, Codex, Claude), use the local harness instead of daily dev:
+
+```bash
+cp .env.agent.example .env.agent.local   # fill from supabase status
+pnpm agent:up
+pnpm agent:seed
+pnpm agent:screenshot --headed   # saves to .agent/screenshots/
+pnpm agent:down
+```
+
+See [docs/adr/0003-agent-harness.md](docs/adr/0003-agent-harness.md) and the **Agent harness** section in [AGENTS.md](AGENTS.md).

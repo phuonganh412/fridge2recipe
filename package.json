@@ -22,10 +22,18 @@
     "test": "pnpm -r test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "agent:up": "bash scripts/agent/up.sh",
+    "agent:down": "bash scripts/agent/down.sh",
+    "agent:reset": "bash scripts/agent/reset.sh",
+    "agent:seed": "bash scripts/agent/seed.sh",
+    "agent:logs": "bash scripts/agent/logs.sh",
+    "agent:screenshot": "bash scripts/agent/screenshot-home.sh",
+    "agent:run": "bash scripts/agent/run.sh"
   },
   "devDependencies": {
     "husky": "^9.1.7",
+    "playwright": "^1.51.1",
     "prettier": "^3.6.2"
   }
 }
