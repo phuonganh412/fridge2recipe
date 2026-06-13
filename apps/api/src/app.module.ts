@@ -9,6 +9,7 @@ import { HealthModule } from "./health/health.module";
 import { InventoryModule } from "./inventory/inventory.module";
 import { MealPlansModule } from "./meal-plans/meal-plans.module";
 import { RecipesModule } from "./recipes/recipes.module";
+import { PrismaModule } from "./prisma/prisma.module";
 import { SupabaseModule } from "./supabase/supabase.module";
 
 @Module({
@@ -20,6 +21,7 @@ import { SupabaseModule } from "./supabase/supabase.module";
         path.join(__dirname, "../../../.env"),
       ],
     }),
+    PrismaModule,
     SupabaseModule,
     AuthModule,
     AiModule,

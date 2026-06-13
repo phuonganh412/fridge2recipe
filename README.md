@@ -58,14 +58,31 @@ pnpm test
 
 ## Environment variables
 
-See [.env.example](.env.example). Web needs `NEXT_PUBLIC_*` Supabase and API URL vars. API needs Supabase service role, JWT secret, and AI Gateway key.
+See [.env.example](.env.example). Web needs `NEXT_PUBLIC_*` Supabase and API URL vars. API needs `DATABASE_URL` (Supabase direct Postgres URL), Supabase service role, JWT secret, and AI Gateway key.
+
+## Database (Prisma)
+
+Schema is defined in `apps/api/prisma/schema.prisma`. Postgres is hosted on Supabase but migrations are owned by Prisma:
+
+```bash
+pnpm --filter @fridge2recipe/api prisma:migrate:dev    # local schema changes
+pnpm --filter @fridge2recipe/api prisma:migrate:deploy # apply migrations (CI / Railway)
+```
+
+Local `DATABASE_URL` example when using `supabase start`:
+
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres
+```
 
 ## Supabase
 
 ```bash
 npx supabase link --project-ref <your-project-ref>
-npx supabase gen types typescript --linked > apps/api/src/supabase/database.types.ts
+npx supabase start   # optional local Postgres, Auth, Storage
 ```
+
+`supabase gen types` is only needed if Supabase client typings change (Storage). Postgres types come from Prisma Client.
 
 ## Deployment
 
@@ -74,7 +91,7 @@ npx supabase gen types typescript --linked > apps/api/src/supabase/database.type
 | `apps/web` | Vercel | `apps/web` |
 | `apps/api` | Railway | `apps/api` |
 
-Set Railway env vars: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `AI_GATEWAY_API_KEY`, `WEB_ORIGIN`, `PORT`.
+Set Railway env vars: `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `AI_GATEWAY_API_KEY`, `WEB_ORIGIN`, `PORT`. `pnpm start` runs `prisma migrate deploy` before the API boots.
 
 Set Vercel env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_API_URL`.
 

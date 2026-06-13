@@ -23,6 +23,7 @@ apps/web/out/
 
 # nestjs
 apps/api/dist/
+apps/api/generated/
 
 # production
 /build
