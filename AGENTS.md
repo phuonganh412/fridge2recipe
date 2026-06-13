@@ -10,6 +10,16 @@
 | `packages/` | Shared packages (empty for now) |
 | `docs/` | Architecture and ADRs |
 
+## Talk before action
+
+Default to discussion. **Do not edit files or commit** until the user explicitly asks to implement (e.g. "go ahead", "implement this") or switches to Agent mode after a planning thread.
+
+While waiting: read/search the codebase and run **non-mutating** commands only (`git status`, `git log`, repro tests).
+
+When design seems settled and the user has not asked to implement, stop and ask: *"Want a plan doc, or should I implement?"* Plan docs stay in chat unless the user names a path or says "save it".
+
+Do not infer implementation from problem statements or finished design discussions.
+
 ## Rules
 
 - Product behavior goes in `apps/api`, not `apps/web/src/services` or Next.js route handlers.
