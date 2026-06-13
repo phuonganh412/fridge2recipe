@@ -2,17 +2,17 @@
 
 ## Monorepo map
 
-| Path | Role |
-|------|------|
-| `apps/web` | Next.js UI on Vercel — rendering, Supabase Auth sessions, REST client |
-| `apps/api` | NestJS REST API on Railway — product logic, AI, Prisma Postgres access |
-| `supabase/` | Supabase CLI config (local Auth, Storage, Postgres) |
-| `packages/` | Shared packages (empty for now) |
-| `docs/` | Architecture and ADRs |
-| `scripts/agent/` | Local agent stack lifecycle (Docker, seed, screenshots) |
+| Path             | Role                                                                    |
+| ---------------- | ----------------------------------------------------------------------- |
+| `apps/web`       | Next.js UI on Vercel — rendering, Supabase Auth sessions, REST client   |
+| `apps/api`       | NestJS REST API on Railway — product logic, AI, Prisma Postgres access  |
+| `supabase/`      | Supabase CLI config (local Auth, Storage, Postgres)                     |
+| `packages/`      | Shared packages (empty for now)                                         |
+| `docs/`          | Architecture and ADRs                                                   |
+| `scripts/agent/` | Local agent stack lifecycle (Docker, seed, screenshots)                 |
 | `scripts/hooks/` | Shared agent hook scripts (Prettier + type-checked ESLint quality gate) |
-| `.cursor/` | Cursor hook config (`.cursor/hooks.json`) |
-| `.codex/` | Codex hook config (`.codex/hooks.json`) |
+| `.cursor/`       | Cursor hook config (`.cursor/hooks.json`)                               |
+| `.codex/`        | Codex hook config (`.codex/hooks.json`)                                 |
 
 ## Talk before action
 
@@ -20,7 +20,7 @@ Default to discussion. **Do not edit files or commit** until the user explicitly
 
 While waiting: read/search the codebase and run **non-mutating** commands only (`git status`, `git log`, repro tests).
 
-When design seems settled and the user has not asked to implement, stop and ask: *"Want a plan doc, or should I implement?"* Plan docs stay in chat unless the user names a path or says "save it".
+When design seems settled and the user has not asked to implement, stop and ask: _"Want a plan doc, or should I implement?"_ Plan docs stay in chat unless the user names a path or says "save it".
 
 Do not infer implementation from problem statements or finished design discussions.
 
@@ -86,15 +86,15 @@ pnpm agent:down     # always run, even on failure
 
 **Commands:**
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm agent:up` | Start local Supabase + agent containers |
-| `pnpm agent:down` | Stop containers (`--full` also stops Supabase) |
-| `pnpm agent:reset` | Reset local DB, re-seed, restart stack |
-| `pnpm agent:seed` | Create idempotent test **User** |
-| `pnpm agent:logs` | Stream Docker logs (`--since`, `--level error`) |
+| Command                 | Purpose                                                 |
+| ----------------------- | ------------------------------------------------------- |
+| `pnpm agent:up`         | Start local Supabase + agent containers                 |
+| `pnpm agent:down`       | Stop containers (`--full` also stops Supabase)          |
+| `pnpm agent:reset`      | Reset local DB, re-seed, restart stack                  |
+| `pnpm agent:seed`       | Create idempotent test **User**                         |
+| `pnpm agent:logs`       | Stream Docker logs (`--since`, `--level error`)         |
 | `pnpm agent:screenshot` | Save homepage PNG to `.agent/screenshots/` (`--headed`) |
-| `pnpm agent:run` | Keep stack up with caps + mandatory teardown |
+| `pnpm agent:run`        | Keep stack up with caps + mandatory teardown            |
 
 **Screenshots** (gitignored):
 
@@ -118,6 +118,7 @@ E2E tests are deferred until feature work begins.
 - [docs/architecture.md](docs/architecture.md) — current architecture
 - [docs/adr/0002-nestjs-monorepo-backend.md](docs/adr/0002-nestjs-monorepo-backend.md) — backend split decision
 - [docs/adr/0003-agent-harness.md](docs/adr/0003-agent-harness.md) — local agent harness
+- [docs/adr/0005-structured-api-logging.md](docs/adr/0005-structured-api-logging.md) — API structured logging
 - [CONTEXT.md](CONTEXT.md) — domain glossary (no implementation details)
 
 ## Next.js (apps/web)
@@ -137,3 +138,25 @@ Vercel root directory: `apps/web`.
 Default port: `3001`. Health check: `GET /health`. Authenticated routes require `Authorization: Bearer <supabase-access-token>`.
 
 Railway root directory: `apps/api`.
+
+### Structured logging
+
+See [docs/adr/0005-structured-api-logging.md](docs/adr/0005-structured-api-logging.md). Logs are JSON lines on stdout in production; local dev pretty-prints by default.
+
+| Env var      | Default                               | Purpose                             |
+| ------------ | ------------------------------------- | ----------------------------------- |
+| `LOG_LEVEL`  | `debug` (local) / `info` (production) | Minimum log level                   |
+| `LOG_PRETTY` | on in non-production                  | Set to `false` for raw JSON locally |
+
+Useful filters while tailing API output:
+
+```bash
+# errors only (pino level 50 = error)
+pnpm dev:api 2>&1 | jq 'select(.level >= 50)'
+
+# trace one request
+pnpm dev:api 2>&1 | jq 'select(.requestId=="abc-123")'
+
+# force raw JSON locally (agent-friendly)
+LOG_PRETTY=false pnpm dev:api
+```
